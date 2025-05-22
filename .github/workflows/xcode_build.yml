@@ -35,7 +35,9 @@ jobs:
     - name: patch to build arm64 MacOS
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
-        mv modules-webbrowser-cmake-patch-cmake-cef_variables.cmake "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake" -v
+        echo "Check if path to the file we are patching is correct ... "
+        ls -l "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
+        mv -v modules-webbrowser-cmake-patch-cmake-cef_variables.cmake "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
     
             
     - name: Install dependencies
