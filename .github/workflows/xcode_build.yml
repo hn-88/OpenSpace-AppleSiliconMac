@@ -31,6 +31,12 @@ jobs:
         git checkout "a5e9b8db17035751c5330100de9a5e934ba42b85" --recurse-submodules
         mkdir build
         cd build
+
+    - name: patch to build arm64 MacOS
+      run: |
+        openSpaceHome="$HOME/source/OpenSpace"
+        mv modules-webbrowser-cmake-patch-cmake-cef_variables.cmake "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake" -v
+    
             
     - name: Install dependencies
       # https://docs.openspaceproject.com/releases-v0.20/contribute/development/compiling/ubuntu.html
