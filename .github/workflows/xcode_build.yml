@@ -46,8 +46,8 @@ jobs:
 
     - name: patch to specify min MacOS 13.3
       run: |
-        # openSpaceHome="$HOME/source/OpenSpace"
-        # mv -v rootCMakeLists.txt "$openSpaceHome/CMakeLists.txt"
+        openSpaceHome="$HOME/source/OpenSpace"
+        mv -v rootCMakeLists.txt "$openSpaceHome/CMakeLists.txt"
     
             
     - name: Install dependencies
