@@ -339,6 +339,9 @@ if(OS_MACOSX)
       set(CEF_BINARY_DIR "${_CEF_ROOT}/$<CONFIG>")
   endif()
 
+  message("CMAKE_OSX_DEPLOYMENT_TARGET is set to ")
+  message(${CMAKE_OSX_DEPLOYMENT_TARGET})
+
   set(CEF_BINARY_DIR_DEBUG    "${_CEF_ROOT}/Debug")
   set(CEF_BINARY_DIR_RELEASE  "${_CEF_ROOT}/Release")
 
