@@ -42,6 +42,7 @@ jobs:
         echo "Check if path to the file we are patching is correct ... "
         ls -l "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
         mv -v modules-webbrowser-cmake-patch-cmake-cef_variables.cmake "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
+        cp -v modules-webbrowser-cmake-cef_support.cmake "$openSpaceHome/modules/webbrowser/cmake/cef_support.cmake"
 
     - name: patch to specify min MacOS 13.3
       run: |
