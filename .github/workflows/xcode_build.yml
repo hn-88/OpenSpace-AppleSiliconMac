@@ -28,11 +28,7 @@ jobs:
         git clone --recursive https://github.com/OpenSpace/OpenSpace.git "$openSpaceHome"
         cd "$openSpaceHome"
         # use the main branch instead # git checkout "releases/v${OPENSPACE_VERSION}" --recurse-submodules
-        git checkout "9d3bc5ac68148a53cba3315a3ae884b9a2a03b59" --recurse-submodules
-        # update sgct to a commit which solves build issues
-        cd "$openSpaceHome/apps/OpenSpace/ext/sgct"
-        git checkout "265e4bb76ce1bd0e8cb28599e1a667aab2ef3622"        
-        cd "$openSpaceHome"
+        git checkout "221c8b427fab792e10327a6dfacefb1ace41e9fd" --recurse-submodules
         mkdir build
         cd build
 
