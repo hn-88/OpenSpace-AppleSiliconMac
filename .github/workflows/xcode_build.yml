@@ -45,6 +45,7 @@ jobs:
         openSpaceHome="$HOME/source/OpenSpace"
         # mv -v rootCMakeLists.txt "$openSpaceHome/CMakeLists.txt"
         mv -v apps-OpenSpace-CMakeLists.txt "$openSpaceHome/apps/OpenSpace/CMakeLists.txt"
+        mv -v modules-webbrowser-CMakeLists.txt "$openSpaceHome/modules/webbrowser/CMakeLists.txt"
     
             
     - name: Install dependencies
