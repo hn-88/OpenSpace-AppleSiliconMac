@@ -263,7 +263,7 @@ if(OS_MACOSX)
     -Wno-unused-parameter           # Don't warn about unused parameters
     )
   list(APPEND CEF_C_COMPILER_FLAGS
-    -std=c99                        # Use the C99 language standard
+    -std=c17                        # Use the C99 language standard
     )
   list(APPEND CEF_CXX_COMPILER_FLAGS
     #-fno-exceptions                 # Disable exceptions
@@ -271,7 +271,7 @@ if(OS_MACOSX)
     -fno-threadsafe-statics         # Don't generate thread-safe statics
     -fobjc-call-cxx-cdtors          # Call the constructor/destructor of C++ instance variables in ObjC objects
     -fvisibility-inlines-hidden     # Give hidden visibility to inlined class member functions
-    -std=gnu++14                    # Use the C++14 language standard including GNU extensions
+    -std=gnu++2a                    # Use the C++14 language standard including GNU extensions
     -Wno-narrowing                  # Don't warn about type narrowing
     -Wsign-compare                  # Warn about mixed signed/unsigned type comparisons
     )
