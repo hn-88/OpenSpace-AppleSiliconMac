@@ -1,4 +1,4 @@
-name: xcode-build
+name: xcode-build-hn-arm64
 
 on: workflow_dispatch
 
