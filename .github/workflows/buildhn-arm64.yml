@@ -25,27 +25,20 @@ jobs:
       # https://docs.openspaceproject.com/releases-v0.20/contribute/development/compiling/macos.html
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
-        git clone --recursive https://github.com/hn-88/OpenSpace.git "$openSpaceHome"
+        git clone --recursive https://github.com/OpenSpace/OpenSpace.git "$openSpaceHome"
         cd "$openSpaceHome"
         # use the main branch instead # git checkout "releases/v${OPENSPACE_VERSION}" --recurse-submodules
         # git checkout "221c8b427fab792e10327a6dfacefb1ace41e9fd" --recurse-submodules
         mkdir build
         cd build
 
-    - name: patch to build arm64 MacOS
+    - name: get patched Ghoul
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
-        echo "Check if path to the file we are patching is correct ... "
-        ls -l "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
-        mv -v modules-webbrowser-cmake-patch-cmake-cef_variables.cmake "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
-        cp -v modules-webbrowser-cmake-cef_support.cmake "$openSpaceHome/modules/webbrowser/cmake/cef_support.cmake"
-
-    - name: patch to specify min MacOS 13.3
-      run: |
-        openSpaceHome="$HOME/source/OpenSpace"
-        # mv -v rootCMakeLists.txt "$openSpaceHome/CMakeLists.txt"
-        mv -v apps-OpenSpace-CMakeLists.txt "$openSpaceHome/apps/OpenSpace/CMakeLists.txt"
-        mv -v modules-webbrowser-CMakeLists.txt "$openSpaceHome/modules/webbrowser/CMakeLists.txt"
+        cd "$openSpaceHome/ext"
+        rm -rf ghoul
+        git clone https://github.com/hn-88/Ghoul.git 
+        
     
             
     - name: Install dependencies
