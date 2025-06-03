@@ -28,7 +28,7 @@ jobs:
         git clone --recursive https://github.com/OpenSpace/OpenSpace.git "$openSpaceHome"
         cd "$openSpaceHome"
         # use the main branch instead # git checkout "releases/v${OPENSPACE_VERSION}" --recurse-submodules
-        git checkout "23783688ba8d3db953df38cbb66e8428105adbc1" --recurse-submodules
+        git checkout "4bf2d675e5ae57287ab751ce57edce5e1f477d45" --recurse-submodules
         mkdir build
         cd build
 
@@ -36,16 +36,16 @@ jobs:
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
         echo "Check if path to the file we are patching is correct ... "
-        ls -l "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
-        mv -v modules-webbrowser-cmake-patch-cmake-cef_variables.cmake "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
-        cp -v modules-webbrowser-cmake-cef_support.cmake "$openSpaceHome/modules/webbrowser/cmake/cef_support.cmake"
+        # ls -l "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
+        # mv -v modules-webbrowser-cmake-patch-cmake-cef_variables.cmake "$openSpaceHome/modules/webbrowser/cmake/patch/cmake/cef_variables.cmake"
+        # cp -v modules-webbrowser-cmake-cef_support.cmake "$openSpaceHome/modules/webbrowser/cmake/cef_support.cmake"
 
     - name: patch to specify min MacOS 13.3
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
         # mv -v rootCMakeLists.txt "$openSpaceHome/CMakeLists.txt"
-        mv -v apps-OpenSpace-CMakeLists.txt "$openSpaceHome/apps/OpenSpace/CMakeLists.txt"
-        mv -v modules-webbrowser-CMakeLists.txt "$openSpaceHome/modules/webbrowser/CMakeLists.txt"
+        # mv -v apps-OpenSpace-CMakeLists.txt "$openSpaceHome/apps/OpenSpace/CMakeLists.txt"
+        # mv -v modules-webbrowser-CMakeLists.txt "$openSpaceHome/modules/webbrowser/CMakeLists.txt"
     
             
     - name: Install dependencies
