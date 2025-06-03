@@ -34,14 +34,7 @@ jobs:
 
     - name: Install GLM
       run: |
-        # wget https://github.com/g-truc/glm/releases/download/1.0.1/glm-1.0.1-light.zip
-        # 7z x glm-1.0.1-light.zip
-        # https://stackoverflow.com/questions/72329370/glm-linking-in-cmakelists-txt
-        git clone https://github.com/g-truc/glm
-        cd glm
-        cmake -DGLM_BUILD_TESTS=OFF DBUILD_SHARED_LIBS=OFF -B build .
-        cmake --build build -- all
-        cmake --build build -- install
+        brew install glm
 
     - name: get patched Ghoul
       run: |
