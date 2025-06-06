@@ -32,8 +32,9 @@ jobs:
         mkdir build
         cd build
 
-    - name: Install GLM
+    - name: Update Homebrew and Install GLM
       run: |
+        brew update
         brew install glm
 
     - name: get patched Ghoul
