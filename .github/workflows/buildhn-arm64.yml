@@ -47,8 +47,8 @@ jobs:
     - name: patch ext-ghoul-src-logging-textlog.cpp
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
-        cp -v ext-ghoul-src-logging-textlog.cpp "$openSpaceHome/ext/ghoul/src/logging/textlog.cpp"
-        cp -v ext-ghoul-src-misc-sharedmemory.cpp "$openSpaceHome/ext/ghoul/src/misc/sharedmemory.cpp"
+        # cp -v ext-ghoul-src-logging-textlog.cpp "$openSpaceHome/ext/ghoul/src/logging/textlog.cpp"
+        # cp -v ext-ghoul-src-misc-sharedmemory.cpp "$openSpaceHome/ext/ghoul/src/misc/sharedmemory.cpp"
     
             
     - name: Install dependencies
