@@ -44,10 +44,10 @@ jobs:
         rm -rf ghoul
         git clone https://github.com/hn-88/Ghoul.git --recursive
 
-    - name: patch ext-ghoul-src-logging-textlog.cpp
+    - name: patch touchbar
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
-        # cp -v ext-ghoul-src-logging-textlog.cpp "$openSpaceHome/ext/ghoul/src/logging/textlog.cpp"
+        cp -v src-interaction-touchbar.mm "$openSpaceHome/src/interaction/touchbar.mm"
         # cp -v ext-ghoul-src-misc-sharedmemory.cpp "$openSpaceHome/ext/ghoul/src/misc/sharedmemory.cpp"
     
             
