@@ -49,10 +49,11 @@ jobs:
         openSpaceHome="$HOME/source/OpenSpace"
         cp -v src-interaction-touchbar.mm "$openSpaceHome/src/interaction/touchbar.mm"
 
-    - name: patch verifier.inl
+    - name: patch verifier.inl, webguimodule.cpp
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
         cp -v include-openspace-documentation-verifier.inl "$openSpaceHome/include/openspace/documentation/verifier.inl"
+        cp -v modules-webgui-webguimodule.cpp "$openSpaceHome/modules/webgui/webguimodule.cpp"
     
             
     - name: Install dependencies
