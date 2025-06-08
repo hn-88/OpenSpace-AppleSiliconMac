@@ -48,7 +48,11 @@ jobs:
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
         cp -v src-interaction-touchbar.mm "$openSpaceHome/src/interaction/touchbar.mm"
-        # cp -v ext-ghoul-src-misc-sharedmemory.cpp "$openSpaceHome/ext/ghoul/src/misc/sharedmemory.cpp"
+
+    - name: patch verifier.inl
+      run: |
+        openSpaceHome="$HOME/source/OpenSpace"
+        cp -v include-openspace-documentation-verifier.inl "$openSpaceHome/include/openspace/documentation/verifier.inl"
     
             
     - name: Install dependencies
