@@ -376,7 +376,11 @@ TestResult InListVerifier<T>::operator()(const ghoul::Dictionary& dict,
             std::string list = std::accumulate(
                 values.begin() + 1,
                 values.end(),
-                std::format("{}", std::to_string(values.front())),
+#ifdef __APPLE__
+                "Not supported on Mac std::format",
+#else
+                std::format("{}", values.front()),
+#endif // APPLE
                 [](std::string lhs, typename T::Type rhs) {
                     return std::format("{}, {}", lhs, rhs);
                 }
