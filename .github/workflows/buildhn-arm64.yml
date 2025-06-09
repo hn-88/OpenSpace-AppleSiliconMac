@@ -55,6 +55,7 @@ jobs:
         cp -v include-openspace-documentation-verifier.inl "$openSpaceHome/include/openspace/documentation/verifier.inl"
         cp -v modules-webgui-webguimodule.cpp "$openSpaceHome/modules/webgui/webguimodule.cpp"
         cp -v modules-webbrowser-webbrowsermodule.cpp "$openSpaceHome/modules/webbrowser/webbrowsermodule.cpp"
+        cp -v ext-json-CMakeLists.txt "$openSpaceHome/ext/json/CMakeLists.txt"
     
             
     - name: Install dependencies
