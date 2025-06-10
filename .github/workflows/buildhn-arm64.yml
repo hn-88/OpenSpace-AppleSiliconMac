@@ -58,7 +58,6 @@ jobs:
         cp -v ext-json-CMakeLists.txt "$openSpaceHome/ext/json/CMakeLists.txt"
         cp -v src-documentation-verifier.cpp "$openSpaceHome/src/documentation/verifier.cpp"
         cp -v modules-webbrowser-src-cefhost.cpp "$openSpaceHome/modules/webbrowser/src/cefhost.cpp"
-        cp -v include-openspace-util-json_helper.inl "$openSpaceHome/include/openspace/util/json_helper.inl"
     
             
     - name: Install dependencies
