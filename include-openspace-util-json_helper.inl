@@ -27,6 +27,27 @@
 #include <ghoul/misc/dictionaryjsonformatter.h>
 #include <type_traits>
 
+#ifdef __APPLE__
+
+namespace std {
+template <>
+struct std::formatter<glm::vec<4, float>> {
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const glm::vec<4, float>& vec, FormatContext& ctx) {
+        return format_to(
+            ctx.out(),
+            "({}, {}, {}, {})",
+            vec.x, vec.y, vec.z, vec.w
+        );
+    }
+};
+
+} // namespace std
+
+#endif // MacOS complains that glm::vec<4, float> is not formattable by std::format
+
 namespace openspace {
 
 namespace internal {
@@ -53,24 +74,6 @@ constexpr bool isGlmVector() {
         glm::dvec2, glm::dvec3, glm::dvec4,
         glm::uvec2, glm::uvec3, glm::uvec4>::value;
 }
-
-#ifdef __APPLE__
-
-template <>
-struct std::formatter<glm::vec<4, float>> {
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-
-    template <typename FormatContext>
-    auto format(const glm::vec<4, float>& vec, FormatContext& ctx) {
-        return format_to(
-            ctx.out(),
-            "({}, {}, {}, {})",
-            vec.x, vec.y, vec.z, vec.w
-        );
-    }
-};
-
-#endif // MacOS complains that glm::vec<4, float> is not formattable
 
 } // namespace internal
 
