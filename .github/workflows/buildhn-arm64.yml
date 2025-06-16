@@ -42,7 +42,7 @@ jobs:
         openSpaceHome="$HOME/source/OpenSpace"
         cd "$openSpaceHome/ext"
         rm -rf ghoul
-        git clone https://github.com/hn-88/Ghoul.git --recursive
+        git clone https://github.com/hn-88/Ghoul.git --branch MacOSfixes --recursive
 
     - name: patch touchbar
       run: |
