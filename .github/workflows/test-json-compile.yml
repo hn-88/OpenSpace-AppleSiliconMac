@@ -20,7 +20,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      repo: nlohmann/json
+      with:
+        repository: nlohmann/json
     
     
     - name: Configure CMake
