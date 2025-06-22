@@ -1,4 +1,4 @@
-name: Openspace-hn-xcode-build-hn-arm64
+name: hn-xcode16-macos-15-build-hn-arm64
 
 on: workflow_dispatch
 
