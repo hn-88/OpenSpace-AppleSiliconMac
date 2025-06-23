@@ -30,7 +30,7 @@ jobs:
 
     - name: Install compiledb (Python tool)
       run: |
-        pip3 install compiledb
+        brew install compiledb
 
     - name: get patched Ghoul
       run: |
