@@ -69,8 +69,8 @@ jobs:
     - name: Generate compile_commands.json using compiledb
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
-        cd "$openSpaceHome/build"
-        compiledb
+        cd "$openSpaceHome"
+        compiledb make -n -C build
 
     - name: Custom individual file compilation
       run: |
