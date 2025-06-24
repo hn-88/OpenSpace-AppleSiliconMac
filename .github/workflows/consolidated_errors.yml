@@ -62,8 +62,8 @@ jobs:
     - name: Configure CMake (Xcode generator)
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
-        cd "$openSpaceHome/build"
-        cmake -G Xcode -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_CXX_STANDARD=20 -DONLY_ACTIVE_ARCH=YES -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 ..
+        cd "$openSpaceHome"
+        cmake -G Ninja -S . -B build -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_CXX_STANDARD=20 -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0
         ls -l
 
     - name: Generate compile_commands.json using compiledb
