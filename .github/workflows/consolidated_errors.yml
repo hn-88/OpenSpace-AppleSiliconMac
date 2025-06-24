@@ -66,19 +66,13 @@ jobs:
         cmake -G Ninja -S . -B build -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_CXX_STANDARD=20 -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0
         ls -l
 
-    - name: Generate compile_commands.json using compiledb
-      run: |
-        openSpaceHome="$HOME/source/OpenSpace"
-        cd "$openSpaceHome"
-        compiledb make -n -C build
-
-    - name: Custom individual file compilation
+    - name: Custom individual file compilationAdd commentMore actions
       run: |
         brew install jq
         chmod +x compile_all_from_compile_commands.sh
         ./compile_all_from_compile_commands.sh "$HOME/source/OpenSpace/build" "$HOME/source/OpenSpace/individual_build" || true
         cat "$HOME/source/OpenSpace/individual_build/compile_errors.txt"
-        
+          
     - name: Upload compile error log
       if: failure()
       uses: actions/upload-artifact@v4
