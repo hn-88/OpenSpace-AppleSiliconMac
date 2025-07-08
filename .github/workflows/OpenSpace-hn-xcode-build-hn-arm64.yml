@@ -93,5 +93,38 @@ jobs:
         # optional, default is artifact
         # A file, directory or wildcard pattern that describes what to upload
         path: /Users/runner/source/OpenSpace/bin/Release/*.app
+
+    - name: Run macdeployqt (Qt6)
+      run: |
+        /usr/local/opt/qt@6/bin/macdeployqt "/Users/runner/source/OpenSpace/bin/Release/OpenSpace.app" -always-overwrite
+
+    - name: Bundle non-Qt dylibs with dylibbundler
+      run: |
+        BUILD_DIR="/Users/runner/source/OpenSpace/bin/Release"
+        APP_NAME=OpenSpace
+        dylibbundler -od -b \
+          -x "$BUILD_DIR/$APP_NAME.app/Contents/MacOS/$APP_NAME" \
+          -d "$BUILD_DIR/$APP_NAME.app/Contents/Frameworks/"
+
+    - name: Self-sign the entire app bundle
+      run: |
+        BUILD_DIR="/Users/runner/source/OpenSpace/bin/Release"
+        APP_NAME=OpenSpace
+        codesign --force --deep --sign - --options runtime \
+          "$BUILD_DIR/$APP_NAME.app"
+
+    - name: Create DMG for distribution
+      run: |
+        BUILD_DIR="/Users/runner/source/OpenSpace/bin/Release"
+        APP_NAME=OpenSpace
+        hdiutil create -volname "$APP_NAME" \
+          -srcfolder "$BUILD_DIR/$APP_NAME.app" \
+          -ov -format UDZO "$APP_NAME.dmg"
+
+    - name: Upload DMG artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: macOS-App
+        path: OpenSpace.dmg
       
     
