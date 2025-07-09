@@ -64,7 +64,7 @@ jobs:
     - name: Install dependencies
       # https://docs.openspaceproject.com/releases-v0.20/contribute/development/compiling/ubuntu.html
       run: |
-        brew install glew boost freeimage mpv vulkan-headers vulkan-loader brotli gdal qt@6 qt6-tools
+        brew install glew boost freeimage mpv vulkan-headers vulkan-loader brotli gdal qt@6 dylibbundler
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -97,7 +97,7 @@ jobs:
     - name: Run macdeployqt (Qt6)
       run: |
         which macdeployqt
-        MACDQT=$(find "$(brew --prefix qt@6)" -name macdeployqt | head -n 1)
+        MACDQT=$(find "/opt/homebrew" -name macdeployqt | head -n 1)
         "$MACDQT" "/Users/runner/source/OpenSpace/bin/Release/OpenSpace.app" -always-overwrite
 
     - name: Bundle non-Qt dylibs with dylibbundler
