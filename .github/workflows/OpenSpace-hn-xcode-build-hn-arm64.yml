@@ -209,7 +209,7 @@ jobs:
         cp -a bin/Release/OpenSpace build/pkg-root/
         
         # 3. Create the postinstall script to create the shortcut
-        cat &lt;&lt; 'EOF' &gt; build/scripts/postinstall
+        cat << 'EOF' > build/scripts/postinstall
         #!/bin/bash
         TARGET="$HOME/OpenSpace"
         LINK="/Applications/OpenSpace"
