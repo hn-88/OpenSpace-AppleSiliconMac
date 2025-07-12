@@ -192,3 +192,56 @@ jobs:
         mkdir bin
         mv -v ../OpenSpace.app bin/OpenSpace.app
         
+    - name: Create .pkg installer for OpenSpace
+      run: |
+        openSpaceHome="$HOME/source/OpenSpace"
+        cd "$openSpaceHome"
+        set -e
+        # 1. Create staging directories
+        mkdir -p build/pkg-root
+        mkdir -p build/scripts
+        
+        # 2. Copy the compiled OpenSpace directory to the pkg root
+        cp -a bin/Release/OpenSpace build/pkg-root/
+        
+        # 3. Create the postinstall script to create the shortcut
+        cat &lt;&lt; 'EOF' &gt; build/scripts/postinstall
+        #!/bin/bash
+        TARGET="$HOME/OpenSpace"
+        LINK="/Applications/OpenSpace"
+        
+        # Remove existing link if any
+        if [ -L "$LINK" ]; then
+          rm -f "$LINK"
+        fi
+        
+        # Create symlink to OpenSpace.app
+        if [ -d "$TARGET/bin/OpenSpace.app" ]; then
+          ln -sfn "$TARGET/bin/OpenSpace.app" "$LINK"
+        fi
+        
+        exit 0
+        EOF
+        
+        chmod +x build/scripts/postinstall
+        
+        # 4. Create component package with pkgbuild
+        pkgbuild \
+          --root build/pkg-root \
+          --install-location "$HOME" \
+          --identifier org.openspace.openspace \
+          --scripts build/scripts \
+          --version 0.1 \
+          build/OpenSpace.pkg
+        
+        # 5. Optional: move the final .pkg somewhere for upload
+        mv build/OpenSpace.pkg bin/Release/OpenSpace.pkg
+
+    - name: Upload pkg Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        # Artifact name
+        name: OpenSpace-MacOS14-AppleSilicon-pkg
+        # optional, default is artifact
+        # A file, directory or wildcard pattern that describes what to upload
+        path: /Users/runner/source/OpenSpace/bin/Release/OpenSpace.pkg
