@@ -125,39 +125,39 @@ jobs:
 
           process_binary() {
             local bin="$1"
-
+          
             otool -L "$bin" | tail -n +2 | awk '{print $1}' | while read -r dep; do
               # Skip system libraries
               if [[ "$dep" == /usr/lib/* || "$dep" == /System/* ]]; then
                 continue
               fi
-
+          
               local dep_base=$(basename "$dep")
-
+          
               # Skip if already seen
               if grep -qx "$dep_base" "$SEEN_LIST"; then
                 continue
               fi
               echo "$dep_base" >> "$SEEN_LIST"
-
-              # Try to locate it
-              local real_path=$(mdfind "kMDItemDisplayName == '$dep_base'" | grep -m 1 "$dep_base")
-              if [[ -z "$real_path" ]]; then
+          
+              # Use otool-reported path directly
+              local real_path="$dep"
+              if [[ ! -f "$real_path" ]]; then
                 echo "⚠️ Could not find $dep"
                 continue
               fi
-
+          
               echo "✅ Found $dep_base at $real_path"
-
+          
               # Copy if not already copied
               if [[ ! -f "$TARGET_FRAMEWORKS_DIR/$dep_base" ]]; then
                 cp -v "$real_path" "$TARGET_FRAMEWORKS_DIR"
               fi
-
+          
               # Fix install name
               install_name_tool -change "$dep" "@executable_path/../Frameworks/$dep_base" "$bin"
-
-              # Recurse into the newly copied dylib
+          
+              # Recurse into the dylib
               if [[ "$real_path" != "$bin" ]]; then
                 process_binary "$TARGET_FRAMEWORKS_DIR/$dep_base"
               fi
@@ -191,6 +191,7 @@ jobs:
         cd bin/Release/OpenSpace
         unzip OpenSpace-0.21.0_minimal.zip
         # replace the Windows binaries with the Mac app
+        rm OpenSpace-0.21.0_minimal.zip
         rm vc_redist.x64.exe
         rm -Rf bin
         mkdir bin
