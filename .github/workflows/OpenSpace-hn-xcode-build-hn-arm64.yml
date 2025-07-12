@@ -115,9 +115,10 @@ jobs:
         bundle_dylibs_recursive() {
           local BINARY="$1"
           local TARGET_FRAMEWORKS_DIR="$2"
-          declare -A SEEN
+          local SEEN_LIST="/tmp/seen_$(basename "$BINARY")_$$.txt"
 
           mkdir -p "$TARGET_FRAMEWORKS_DIR"
+          touch "$SEEN_LIST"
 
           echo "🔍 Processing: $BINARY"
           echo "📁 Target Frameworks Dir: $TARGET_FRAMEWORKS_DIR"
@@ -134,10 +135,10 @@ jobs:
               local dep_base=$(basename "$dep")
 
               # Skip if already seen
-              if [[ -n "${SEEN[$dep_base]}" ]]; then
+              if grep -qx "$dep_base" "$SEEN_LIST"; then
                 continue
               fi
-              SEEN[$dep_base]=1
+              echo "$dep_base" >> "$SEEN_LIST"
 
               # Try to locate it
               local real_path=$(mdfind "kMDItemDisplayName == '$dep_base'" | grep -m 1 "$dep_base")
@@ -156,7 +157,7 @@ jobs:
               # Fix install name
               install_name_tool -change "$dep" "@executable_path/../Frameworks/$dep_base" "$bin"
 
-              # Now recurse into the dylib we just copied
+              # Recurse into the newly copied dylib
               if [[ "$real_path" != "$bin" ]]; then
                 process_binary "$TARGET_FRAMEWORKS_DIR/$dep_base"
               fi
@@ -164,6 +165,9 @@ jobs:
           }
 
           process_binary "$BINARY"
+
+          # Clean up seen list
+          rm -f "$SEEN_LIST"
         }
 
         # Paths
