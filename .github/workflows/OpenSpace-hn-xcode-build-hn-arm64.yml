@@ -116,57 +116,88 @@ jobs:
           local BINARY="$1"
           local TARGET_FRAMEWORKS_DIR="$2"
           local SEEN_LIST="/tmp/seen_$(basename "$BINARY")_$$.txt"
-
+        
           mkdir -p "$TARGET_FRAMEWORKS_DIR"
           touch "$SEEN_LIST"
-
+        
           echo "🔍 Processing: $BINARY"
           echo "📁 Target Frameworks Dir: $TARGET_FRAMEWORKS_DIR"
-
+        
+          # Resolve @rpath, @loader_path, or return absolute paths
+          resolve_real_path() {
+            local dep="$1"
+            local binary="$2"
+        
+            if [[ "$dep" == @rpath/* ]]; then
+              # Use otool -l to extract all rpaths from the binary
+              otool -l "$binary" | awk '
+                $1 == "cmd" && $2 == "LC_RPATH" {getline; getline; print $2}
+              ' | while read -r rpath; do
+                local full="$rpath/${dep#@rpath/}"
+                if [[ -f "$full" ]]; then
+                  echo "$full"
+                  return
+                fi
+              done
+            elif [[ "$dep" == @loader_path/* ]]; then
+              local loader_dir
+              loader_dir=$(dirname "$binary")
+              local full="$loader_dir/${dep#@loader_path/}"
+              if [[ -f "$full" ]]; then
+                echo "$full"
+                return
+              fi
+            elif [[ -f "$dep" ]]; then
+              echo "$dep"
+              return
+            fi
+        
+            return 1
+          }
+        
           process_binary() {
             local bin="$1"
-          
+        
             otool -L "$bin" | tail -n +2 | awk '{print $1}' | while read -r dep; do
               # Skip system libraries
               if [[ "$dep" == /usr/lib/* || "$dep" == /System/* ]]; then
                 continue
               fi
-          
+        
               local dep_base=$(basename "$dep")
-          
-              # Skip if already seen
+        
+              # Skip already seen
               if grep -qx "$dep_base" "$SEEN_LIST"; then
                 continue
               fi
               echo "$dep_base" >> "$SEEN_LIST"
-          
-              # Use otool-reported path directly
-              local real_path="$dep"
-              if [[ ! -f "$real_path" ]]; then
-                echo "⚠️ Could not find $dep"
+        
+              local real_path
+              real_path=$(resolve_real_path "$dep" "$bin")
+              if [[ -z "$real_path" ]]; then
+                echo "⚠️ Could not resolve $dep"
                 continue
               fi
-          
+        
               echo "✅ Found $dep_base at $real_path"
-          
-              # Copy if not already copied
+        
+              # Copy to app bundle
               if [[ ! -f "$TARGET_FRAMEWORKS_DIR/$dep_base" ]]; then
                 cp -v "$real_path" "$TARGET_FRAMEWORKS_DIR"
               fi
-          
-              # Fix install name
+        
+              # Update binary to use @executable_path-relative path
               install_name_tool -change "$dep" "@executable_path/../Frameworks/$dep_base" "$bin"
-          
-              # Recurse into the dylib
+        
+              # Recurse into the copied dylib
               if [[ "$real_path" != "$bin" ]]; then
                 process_binary "$TARGET_FRAMEWORKS_DIR/$dep_base"
               fi
             done
           }
-
+        
           process_binary "$BINARY"
-
-          # Clean up seen list
+        
           rm -f "$SEEN_LIST"
         }
 
