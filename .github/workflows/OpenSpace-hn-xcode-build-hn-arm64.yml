@@ -109,6 +109,7 @@ jobs:
         mkdir -p bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/Frameworks
 
     - name: Recursively bundle dylibs for main and helper apps
+      shell: bash
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
         cd "$openSpaceHome"
@@ -187,7 +188,8 @@ jobs:
               fi
         
               # Update binary to use @executable_path-relative path
-              install_name_tool -change "$dep" "@executable_path/../Frameworks/$dep_base" "$bin"
+              echo "Running install_name_tool on $bin for $dep..."
+              install_name_tool -change "$dep" "@executable_path/../Frameworks/$dep_base" "$bin" || echo "❌ install_name_tool failed for $dep"
         
               # Recurse into the copied dylib
               if [[ "$real_path" != "$bin" ]]; then
