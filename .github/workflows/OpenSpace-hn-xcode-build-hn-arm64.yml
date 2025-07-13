@@ -211,7 +211,9 @@ jobs:
         HELPER_FW="bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/Frameworks"
 
         # Run recursive bundling for both
+        echo "Running bundle_dylibs_recursive for $MAIN_APP with fw $MAIN_FW" 
         bundle_dylibs_recursive "$MAIN_APP" "$MAIN_FW"
+        echo "Running bundle_dylibs_recursive for $HELPER_APP with fw $HELPER_FW"
         bundle_dylibs_recursive "$HELPER_APP" "$HELPER_FW"
 
     - name: Get OpenSpace Windows minimal
