@@ -130,7 +130,8 @@ jobs:
             local binary="$2"
         
             if [[ "$dep" == @rpath/* ]]; then
-              # Use otool -l to extract all rpaths from the binary
+              echo "Using otool -l to extract all rpaths from the binary ..."
+              otool -l "$binary"
               otool -l "$binary" | awk '
                 $1 == "cmd" && $2 == "LC_RPATH" {getline; getline; print $2}
               ' | while read -r rpath; do
@@ -159,8 +160,10 @@ jobs:
           process_binary() {
             local bin="$1"
         
+            echo "Using otool -L to print all dependencies..."
+            otool -L "$bin"
             otool -L "$bin" | tail -n +2 | awk '{print $1}' | while read -r dep; do
-              # Skip system libraries
+              # Skip system libraries, but don't skip QT
               if [[ "$dep" == /usr/lib/* || "$dep" == /System/* ]]; then
                 continue
               fi
@@ -193,14 +196,15 @@ jobs:
         
               # Recurse into the copied dylib
               if [[ "$real_path" != "$bin" ]]; then
-                process_binary "$TARGET_FRAMEWORKS_DIR/$dep_base"
+                echo "Running process_binary on $TARGET_FRAMEWORKS_DIR/$dep_base..."
+                process_binary "$TARGET_FRAMEWORKS_DIR/$dep_base" || echo "❌ process_binary failed for $TARGET_FRAMEWORKS_DIR/$dep_base"
               fi
             done
           }
+          echo "Running process_binary for $BINARY"
+          process_binary "$BINARY" || echo "❌ process_binary failed for $BINARY"
         
-          process_binary "$BINARY"
-        
-          rm -f "$SEEN_LIST"
+          rm -f "$SEEN_LIST" || echo "❌ rm failed for $SEEN_LIST"
         }
 
         # Paths
@@ -210,11 +214,24 @@ jobs:
         HELPER_APP="bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/MacOS/OpenSpace_Helper"
         HELPER_FW="bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/Frameworks"
 
-        # Run recursive bundling for both
+        # Run recursive bundling for only main app, as seen in 0.19.2
         echo "Running bundle_dylibs_recursive for $MAIN_APP with fw $MAIN_FW" 
         bundle_dylibs_recursive "$MAIN_APP" "$MAIN_FW"
-        echo "Running bundle_dylibs_recursive for $HELPER_APP with fw $HELPER_FW"
-        bundle_dylibs_recursive "$HELPER_APP" "$HELPER_FW"
+        # echo "Running bundle_dylibs_recursive for $HELPER_APP with fw $HELPER_FW"
+        # bundle_dylibs_recursive "$HELPER_APP" "$HELPER_FW"
+
+    - name: Codesign entire OpenSpace.app (ad-hoc)
+      run: |
+        openSpaceHome="$HOME/source/OpenSpace"
+        cd "$openSpaceHome"
+        codesign --force --deep --sign - bin/Release/OpenSpace.app || true
+
+    - name: Verifying Codesign
+      run: |
+        openSpaceHome="$HOME/source/OpenSpace"
+        cd "$openSpaceHome"
+        codesign --verify --verbose=4 bin/Release/OpenSpace.app
+
 
     - name: Get OpenSpace Windows minimal
       run: |
