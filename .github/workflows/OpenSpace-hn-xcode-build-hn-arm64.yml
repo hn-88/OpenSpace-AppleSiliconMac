@@ -113,25 +113,24 @@ jobs:
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
         cd "$openSpaceHome"
+    
         bundle_dylibs_recursive() {
           local BINARY="$1"
           local TARGET_FRAMEWORKS_DIR="$2"
           local SEEN_LIST="/tmp/seen_$(basename "$BINARY")_$$.txt"
-        
+    
           mkdir -p "$TARGET_FRAMEWORKS_DIR"
           touch "$SEEN_LIST"
-        
+    
           echo "🔍 Processing: $BINARY"
           echo "📁 Target Frameworks Dir: $TARGET_FRAMEWORKS_DIR"
-        
-          # Resolve @rpath, @loader_path, or return absolute paths
+    
           resolve_real_path() {
             local dep="$1"
             local binary="$2"
-        
+    
+            # Handle @rpath
             if [[ "$dep" == @rpath/* ]]; then
-              echo "Using otool -l to extract all rpaths from the binary ..."
-              otool -l "$binary"
               otool -l "$binary" | awk '
                 $1 == "cmd" && $2 == "LC_RPATH" {getline; getline; print $2}
               ' | while read -r rpath; do
@@ -141,6 +140,16 @@ jobs:
                   return
                 fi
               done
+              # Fallback paths for @rpath
+              for fallback in /opt/homebrew/lib /opt/homebrew/opt/vulkan-loader/lib /usr/local/lib; do
+                local full="$fallback/${dep#@rpath/}"
+                if [[ -f "$full" ]]; then
+                  echo "$full"
+                  return
+                fi
+              done
+    
+            # Handle @loader_path
             elif [[ "$dep" == @loader_path/* ]]; then
               local loader_dir
               loader_dir=$(dirname "$binary")
@@ -149,76 +158,106 @@ jobs:
                 echo "$full"
                 return
               fi
+    
+            # Absolute path
             elif [[ -f "$dep" ]]; then
               echo "$dep"
               return
             fi
-        
+    
             return 1
           }
-        
+    
           process_binary() {
             local bin="$1"
-        
-            echo "Using otool -L to print all dependencies..."
+            echo "📦 Dependencies for $bin:"
             otool -L "$bin"
+    
             otool -L "$bin" | tail -n +2 | awk '{print $1}' | while read -r dep; do
-              # Skip system libraries, but don't skip QT
+              # Skip system libraries
               if [[ "$dep" == /usr/lib/* || "$dep" == /System/* ]]; then
                 continue
               fi
-        
-              local dep_base=$(basename "$dep")
-        
-              # Skip already seen
+    
+              local dep_base
+              dep_base=$(basename "$dep")
+    
+              # Already processed
               if grep -qx "$dep_base" "$SEEN_LIST"; then
                 continue
               fi
               echo "$dep_base" >> "$SEEN_LIST"
-        
+    
               local real_path
               real_path=$(resolve_real_path "$dep" "$bin")
               if [[ -z "$real_path" ]]; then
                 echo "⚠️ Could not resolve $dep"
                 continue
               fi
-        
-              echo "✅ Found $dep_base at $real_path"
-        
-              # Copy to app bundle
+    
+              echo "✅ Resolved $dep_base → $real_path"
+    
               if [[ ! -f "$TARGET_FRAMEWORKS_DIR/$dep_base" ]]; then
                 cp -v "$real_path" "$TARGET_FRAMEWORKS_DIR"
               fi
-        
-              # Update binary to use @executable_path-relative path
-              echo "Running install_name_tool on $bin for $dep..."
-              install_name_tool -change "$dep" "@executable_path/../Frameworks/$dep_base" "$bin" || echo "❌ install_name_tool failed for $dep"
-        
-              # Recurse into the copied dylib
+    
+              # Relink binary
+              install_name_tool -change "$dep" "@executable_path/../Frameworks/$dep_base" "$bin" || \
+                echo "❌ install_name_tool failed for $dep"
+    
+              # Recurse
               if [[ "$real_path" != "$bin" ]]; then
-                echo "Running process_binary on $TARGET_FRAMEWORKS_DIR/$dep_base..."
-                process_binary "$TARGET_FRAMEWORKS_DIR/$dep_base" || echo "❌ process_binary failed for $TARGET_FRAMEWORKS_DIR/$dep_base"
+                process_binary "$TARGET_FRAMEWORKS_DIR/$dep_base"
               fi
             done
           }
-          echo "Running process_binary for $BINARY"
-          process_binary "$BINARY" || echo "❌ process_binary failed for $BINARY"
-        
-          rm -f "$SEEN_LIST" || echo "❌ rm failed for $SEEN_LIST"
+    
+          process_binary "$BINARY" || echo "❌ Failed processing $BINARY"
+          rm -f "$SEEN_LIST"
         }
-
+    
         # Paths
         MAIN_APP="bin/Release/OpenSpace.app/Contents/MacOS/OpenSpace"
         MAIN_FW="bin/Release/OpenSpace.app/Contents/Frameworks"
-
+    
         HELPER_APP="bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/MacOS/OpenSpace_Helper"
         HELPER_FW="bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/Frameworks"
-
-        # Run recursive bundling for only main app, as seen in 0.19.2
-        echo "Running bundle_dylibs_recursive for $MAIN_APP with fw $MAIN_FW" 
+    
+        echo "🚀 Bundling main OpenSpace binary"
         bundle_dylibs_recursive "$MAIN_APP" "$MAIN_FW"
-        # echo "Running bundle_dylibs_recursive for $HELPER_APP with fw $HELPER_FW"
-        # bundle_dylibs_recursive "$HELPER_APP" "$HELPER_FW"
+    
+        echo "🚀 Bundling helper binary"
+        bundle_dylibs_recursive "$HELPER_APP" "$MAIN_FW"
+    
+        echo "🛠️ Manually check for and bundle Vulkan dylib (if not resolved)"
+        VULKAN_DYLIB="libvulkan.1.dylib"
+        if ! [[ -f "$MAIN_FW/$VULKAN_DYLIB" ]]; then
+          found=$(find /opt/homebrew /usr/local -name "$VULKAN_DYLIB" 2>/dev/null | head -n 1)
+          if [[ -n "$found" ]]; then
+            echo "📥 Copying missing Vulkan dylib: $found"
+            cp -v "$found" "$MAIN_FW/$VULKAN_DYLIB"
+            install_name_tool -add_rpath @executable_path/../Frameworks "$MAIN_APP"
+            install_name_tool -change "/opt/homebrew/opt/vulkan-loader/lib/$VULKAN_DYLIB" \
+              "@executable_path/../Frameworks/$VULKAN_DYLIB" "$MAIN_APP" || true
+          else
+            echo "⚠️ Vulkan dylib not found on system — app may fail at runtime"
+          fi
+        fi
+    
+        echo "🔍 Final check for unresolved dylibs:"
+        unresolved=$(otool -L "$MAIN_APP" | awk '{print $1}' | grep -v -E "^(@executable_path|@loader_path|/usr/lib|/System|@rpath|:)$" | while read -r lib; do
+          if [[ ! -f "$lib" && ! -f "$MAIN_FW/$(basename "$lib")" ]]; then
+            echo "❌ Unresolved: $lib"
+          fi
+        done)
+    
+        if [[ -n "$unresolved" ]]; then
+          echo "$unresolved"
+          echo "🚨 Some dylibs are still unresolved!"
+          exit 1
+        else
+          echo "✅ All dependencies resolved!"
+        fi
 
     - name: Codesign entire OpenSpace.app (ad-hoc)
       run: |
