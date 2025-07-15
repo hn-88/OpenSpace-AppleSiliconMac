@@ -106,13 +106,19 @@ jobs:
         openSpaceHome="$HOME/source/OpenSpace"
         cd "$openSpaceHome"
         mkdir -p bin/Release/OpenSpace.app/Contents/Frameworks
-        mkdir -p bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/Frameworks
+        # mkdir -p bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/Frameworks
+        # OpenSpace_Helper.app/Contents/Frameworks is not seen in 0.19.2, so not creating or processing it.
 
     - name: Recursively bundle dylibs for main and helper apps
       shell: bash
       run: |
         openSpaceHome="$HOME/source/OpenSpace"
         cd "$openSpaceHome"
+
+        # Global list of copied dylibs (to avoid redundant copies)
+        COPIED_LIST="/tmp/copied_dylibs_$$.txt"
+        touch "$COPIED_LIST"
+        trap "rm -f '$COPIED_LIST'" EXIT
     
         bundle_dylibs_recursive() {
           local BINARY="$1"
@@ -220,14 +226,14 @@ jobs:
         MAIN_APP="bin/Release/OpenSpace.app/Contents/MacOS/OpenSpace"
         MAIN_FW="bin/Release/OpenSpace.app/Contents/Frameworks"
     
-        HELPER_APP="bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/MacOS/OpenSpace_Helper"
-        HELPER_FW="bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/Frameworks"
+        # HELPER_APP="bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/MacOS/OpenSpace_Helper"
+        # HELPER_FW="bin/Release/OpenSpace.app/Contents/Frameworks/OpenSpace_Helper.app/Contents/Frameworks"
     
         echo "🚀 Bundling main OpenSpace binary"
         bundle_dylibs_recursive "$MAIN_APP" "$MAIN_FW"
     
-        echo "🚀 Bundling helper binary"
-        bundle_dylibs_recursive "$HELPER_APP" "$MAIN_FW"
+        # echo "🚀 Bundling helper binary"
+        # bundle_dylibs_recursive "$HELPER_APP" "$MAIN_FW"
     
         echo "🛠️ Manually check for and bundle Vulkan dylib (if not resolved)"
         VULKAN_DYLIB="libvulkan.1.dylib"
