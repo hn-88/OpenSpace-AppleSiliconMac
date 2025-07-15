@@ -231,6 +231,9 @@ jobs:
     
         echo "🛠️ Manually check for and bundle Vulkan dylib (if not resolved)"
         VULKAN_DYLIB="libvulkan.1.dylib"
+        if [[ -f "$MAIN_FW/$VULKAN_DYLIB" ]]; then
+          echo "✅ Found $MAIN_FW/$VULKAN_DYLIB"
+        fi  
         if ! [[ -f "$MAIN_FW/$VULKAN_DYLIB" ]]; then
           found=$(find /opt/homebrew /usr/local -name "$VULKAN_DYLIB" 2>/dev/null | head -n 1)
           if [[ -n "$found" ]]; then
@@ -253,7 +256,7 @@ jobs:
     
         if [[ -n "$unresolved" ]]; then
           echo "$unresolved"
-          echo "🚨 Some dylibs are still unresolved!"
+          echo "🚨 Some dylibs are still unresolved! Please check if all are system dylibs."
           # exit 1 - don't exit for unresolved system libs!
         else
           echo "✅ All dependencies resolved!"
