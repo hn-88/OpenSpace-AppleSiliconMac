@@ -42,10 +42,13 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: v0.21.0plus5
-          tag_name: v0.21.0plus5  # This tag doesn't need to exist yet!
-          target_commitish: ${{ github.sha }}
+          tag_name: v0.21.0plus5
+          target_commitish: eb999678f2cea3f408faa77ccd13106ec3525e44
           draft: true
           files: ${{ steps.find_pkg.outputs.pkg_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}  # Use PAT instead of default token
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
