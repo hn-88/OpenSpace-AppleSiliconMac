@@ -49,6 +49,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}  # Use PAT instead of default token
 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
