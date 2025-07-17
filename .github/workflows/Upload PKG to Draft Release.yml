@@ -8,9 +8,6 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository (required to create tags)
-        uses: actions/checkout@v4
-
       - name: Set release version
         id: vars
         run: echo "tag=v0.21.0plus5" >> $GITHUB_OUTPUT
@@ -41,22 +38,14 @@ jobs:
           echo "Found pkg: $PKG_FILE"
           echo "pkg_path=$PKG_FILE" >> $GITHUB_OUTPUT
 
-      - name: Create tag if not exists
-        run: |
-          TAG=${{ steps.vars.outputs.tag }}
-          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
-            git config user.name "github-actions"
-            git config user.email "github-actions@github.com"
-            git tag "$TAG"
-            git push origin "$TAG"
-          fi
-
       - name: Create draft release and upload pkg
         uses: softprops/action-gh-release@v1
         with:
-          name: ${{ steps.vars.outputs.tag }}
-          tag_name: ${{ steps.vars.outputs.tag }}
+          name: v0.21.0plus5
+          tag_name: v0.21.0plus5  # This tag doesn't need to exist yet!
+          target_commitish: ${{ github.sha }}
           draft: true
           files: ${{ steps.find_pkg.outputs.pkg_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
