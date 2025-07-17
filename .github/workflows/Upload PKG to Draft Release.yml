@@ -1,0 +1,37 @@
+name: Upload PKG to Draft Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload-release:
+    runs-on: macos-latest
+
+    steps:
+      - name: Download artifact from run
+        run: |
+          curl -L -o artifact.zip \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://github.com/hn-88/OpenSpace-AppleSiliconMac/actions/runs/16336009118/artifacts/3551388018/zip
+
+      - name: Unzip artifact
+        run: |
+          unzip artifact.zip -d unpacked
+
+      - name: Find PKG file
+        id: find_pkg
+        run: |
+          PKG_FILE=$(find unpacked -name "*.pkg" | head -n 1)
+          echo "Found pkg: $PKG_FILE"
+          echo "pkg_path=$PKG_FILE" >> $GITHUB_OUTPUT
+
+      - name: Create draft release and upload pkg
+        uses: softprops/action-gh-release@v1
+        with:
+          name: v0.21.0plus5
+          tag_name: v0.21.0plus5
+          draft: true
+          files: ${{ steps.find_pkg.outputs.pkg_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
