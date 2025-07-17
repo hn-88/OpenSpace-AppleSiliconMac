@@ -8,12 +8,22 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Download artifact from run
+      - name: Get artifact download URL
+        id: get_artifact_url
         run: |
-          curl -L -o artifact.zip \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://github.com/hn-88/OpenSpace-AppleSiliconMac/actions/runs/16336009118/artifacts/3551388018/zip
+          API_URL="https://api.github.com/repos/hn-88/OpenSpace-AppleSiliconMac/actions/artifacts/3551388018/zip"
+          AUTH="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
+          ACCEPT="Accept: application/vnd.github+json"
+
+          # Use the GitHub API to get the redirect location
+          curl -sSL -H "$AUTH" -H "$ACCEPT" -D headers.txt -o /dev/null "$API_URL"
+
+          DOWNLOAD_URL=$(grep -i "^location: " headers.txt | cut -d' ' -f2 | tr -d '\r\n')
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+
+      - name: Download artifact
+        run: |
+          curl -L -o artifact.zip "${{ steps.get_artifact_url.outputs.download_url }}"
 
       - name: Unzip artifact
         run: |
