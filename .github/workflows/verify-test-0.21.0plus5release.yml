@@ -1,4 +1,4 @@
-name: 0.21.0plus4 Test OpenSpace macOS PKG Installer
+name: 0.21.0plus5 Test OpenSpace macOS PKG Installer
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
       - name: Download OpenSpace PKG
         run: |
           curl -L -o OpenSpace.pkg \
-            https://github.com/hn-88/OpenSpace-AppleSiliconMac/releases/download/v0.21.0plus5/OpenSpace-0.21.0plus5-minimal.pkg
+            https://github.com/hn-88/OpenSpace-AppleSiliconMac/releases/download/v0.21.0plus5/OpenSpace.pkg
 
       - name: Remove quarantine attribute from PKG
         run: |
