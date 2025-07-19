@@ -20,6 +20,7 @@ jobs:
         run: |
           xattr -rd com.apple.quarantine install_openspace_applesilicon.sh || echo "No quarantine flag on script"
           bash install_openspace_applesilicon.sh
+          sleep 300
 
       - name: Remove quarantine from installed files
         run: |
