@@ -59,8 +59,14 @@ jobs:
             exit 1
           fi
 
-      - name: Run OpenSpace for 5 minutes with -b bypasslauncher
+      - name: Run OpenSpace for 5 minutes
         run: | 
-          open $HOME/OpenSpace/bin/OpenSpace.app -b || echo "Allow errors due to headless runner."
+          open $HOME/OpenSpace/bin/OpenSpace.app || echo "Allow errors due to headless runner."
+          sleep 300
+
+      - name: Run OpenSpace for 5 minutes from executable with -b
+        run: |
+          cd $HOME/OpenSpace
+          ./bin/OpenSpace.app/Contents/MacOS/OpenSpace -b || echo "Allow errors due to headless runner."
           sleep 300
 
