@@ -40,7 +40,7 @@ jobs:
 
       - name: Download artifact2
         run: |
-          curl -L -o OpenSpace-MacOS14-AppleSilicon-before-bundling.zip "${{ steps.get_artifact_url2.outputs.download_url2 }}"
+          curl -L -o OpenSpace_app-MacOS14-AppleSilicon-before-bundling.zip "${{ steps.get_artifact_url2.outputs.download_url2 }}"
 
       - name: Unzip artifact
         run: |
