@@ -10,12 +10,12 @@ jobs:
     steps:
       - name: Set release version
         id: vars
-        run: echo "tag=v0.21.0plus5" >> $GITHUB_OUTPUT
+        run: echo "tag=v0.21.0plus6" >> $GITHUB_OUTPUT
 
       - name: Get artifact download URL
         id: get_artifact_url
         run: |
-          API_URL="https://api.github.com/repos/hn-88/OpenSpace-AppleSiliconMac/actions/artifacts/3551388018/zip"
+          API_URL="https://api.github.com/repos/hn-88/OpenSpace-AppleSiliconMac/actions/artifacts/3568532245/zip"
           AUTH="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
           ACCEPT="Accept: application/vnd.github+json"
 
@@ -26,6 +26,21 @@ jobs:
       - name: Download artifact
         run: |
           curl -L -o artifact.zip "${{ steps.get_artifact_url.outputs.download_url }}"
+
+      - name: Get artifact2 download URL
+        id: get_artifact_url2
+        run: |
+          API_URL="https://api.github.com/repos/hn-88/OpenSpace-AppleSiliconMac/actions/artifacts/3568529875/zip"
+          AUTH="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
+          ACCEPT="Accept: application/vnd.github+json"
+
+          curl -sSL -H "$AUTH" -H "$ACCEPT" -D headers.txt -o /dev/null "$API_URL"
+          DOWNLOAD_URL=$(grep -i "^location: " headers.txt | cut -d' ' -f2 | tr -d '\r\n')
+          echo "download_url2=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+
+      - name: Download artifact2
+        run: |
+          curl -L -o OpenSpace-MacOS14-AppleSilicon-before-bundling.zip "${{ steps.get_artifact_url2.outputs.download_url2 }}"
 
       - name: Unzip artifact
         run: |
@@ -45,7 +60,9 @@ jobs:
           tag_name: v0.21.0plus5
           target_commitish: eb999678f2cea3f408faa77ccd13106ec3525e44
           draft: true
-          files: ${{ steps.find_pkg.outputs.pkg_path }}
+          files: |
+            ${{ steps.find_pkg.outputs.pkg_path }}
+            OpenSpace_app-MacOS14-AppleSilicon-before-bundling.zip
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}  # Use PAT instead of default token
 
