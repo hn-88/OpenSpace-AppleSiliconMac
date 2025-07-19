@@ -23,6 +23,7 @@ jobs:
       - name: Install OpenSpace.pkg
         run: |
           sudo installer -pkg OpenSpace.pkg -target / | tee logs/install.log
+          sudo chown -R "$USER" "$HOME/OpenSpace"
 
       - name: Remove quarantine from installed files
         run: |
