@@ -20,7 +20,7 @@ jobs:
         run: |
           xattr -rd com.apple.quarantine install_openspace_applesilicon.sh || echo "No quarantine flag on script"
           bash install_openspace_applesilicon.sh
-          sleep 300
+          
 
       - name: Remove quarantine from installed files
         run: |
@@ -58,4 +58,9 @@ jobs:
             echo "❌ No shortcut found at $SHORTCUT"
             exit 1
           fi
+
+      - name: Run OpenSpace for 5 minutes with -b bypasslauncher
+        run: | 
+          open $HOME/OpenSpace/bin/OpenSpace.app -b || echo "Allow errors due to headless runner."
+          sleep 300
 
