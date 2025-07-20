@@ -28,7 +28,7 @@ jobs:
         git clone --recursive https://github.com/hn-88/OpenSpace.git "$openSpaceHome"
         cd "$openSpaceHome"
         # use the main branch instead # git checkout "releases/v${OPENSPACE_VERSION}" --recurse-submodules
-        git checkout ToCompileOnMacOS --recurse-submodules
+        git checkout ToCompileOnXCode16.4 --recurse-submodules
         mkdir build
         cd build
 
@@ -89,9 +89,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         # Artifact name
-        name: OpenSpace-MacOS14-AppleSilicon
+        name: OpenSpace-MacOS15-AppleSilicon-app
         # optional, default is artifact
         # A file, directory or wildcard pattern that describes what to upload
-        path: $HOME/source/OpenSpace/*
+        path: $HOME/source/OpenSpace/bin/Release/*.app
       
     
