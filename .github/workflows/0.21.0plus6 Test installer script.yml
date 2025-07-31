@@ -24,9 +24,9 @@ jobs:
 
       - name: Remove quarantine from installed files
         run: |
-          if [ -d "$HOME/OpenSpace" ]; then
+          if [ -d "./OpenSpace" ]; then
             echo "✅ Found installation directory"
-            xattr -r -d com.apple.quarantine "$HOME/OpenSpace/bin/OpenSpace.app" || echo "No quarantine flag found on installed files"
+            xattr -r -d com.apple.quarantine "./OpenSpace/bin/OpenSpace.app" || echo "No quarantine flag found on installed files"
           else
             echo "❌ Installation directory not found"
             exit 1
@@ -34,7 +34,7 @@ jobs:
 
       - name: Verify .app bundle
         run: |
-          if [ -d "$HOME/OpenSpace/bin/OpenSpace.app" ]; then
+          if [ -d "./OpenSpace/bin/OpenSpace.app" ]; then
             echo "✅ Found OpenSpace.app"
           else
             echo "❌ OpenSpace.app not found at expected location"
@@ -44,7 +44,7 @@ jobs:
       - name: Check Applications Shortcut
         run: |
           SHORTCUT="/Applications/OpenSpace"
-          TARGET="$HOME/OpenSpace/bin/OpenSpace.app"
+          TARGET="./OpenSpace/bin/OpenSpace.app"
           if [ -L "$SHORTCUT" ]; then
             LINK_TARGET=$(readlink "$SHORTCUT")
             echo "🔗 Shortcut found: $SHORTCUT → $LINK_TARGET"
@@ -61,12 +61,12 @@ jobs:
 
       - name: Run OpenSpace for 5 minutes
         run: | 
-          open $HOME/OpenSpace/bin/OpenSpace.app || echo "Allow errors due to headless runner."
+          open ./OpenSpace/bin/OpenSpace.app || echo "Allow errors due to headless runner."
           sleep 300
 
       - name: Run OpenSpace for 5 minutes from executable with -b
         run: |
-          cd $HOME/OpenSpace
+          cd ./OpenSpace
           ./bin/OpenSpace.app/Contents/MacOS/OpenSpace -b || echo "Allow errors due to headless runner."
           sleep 300
 
